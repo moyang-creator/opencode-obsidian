@@ -1,0 +1,14 @@
+{
+  "port": 4405,
+  "hostname": "127.0.0.1",
+  "autoStart": false,
+  "opencodePath": "opencode",
+  "projectDirectory": "",
+  "startupTimeout": 45000,
+  "defaultViewLocation": "sidebar",
+  "injectWorkspaceContext": false,
+  "maxNotesInContext": 20,
+  "maxSelectionLength": 2000,
+  "customCommand": "powershell.exe -NoProfile -NonInteractive -Command \"& opencode.ps1 serve --port 4405 --hostname 127.0.0.1 --cors app://obsidian.md\"",
+  "useCustomCommand": true
+}

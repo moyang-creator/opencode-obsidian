@@ -97,3 +97,32 @@ If you see "Executable not found at 'opencode'" despite opencode being installed
 
 This is due to Electron/Obsidian not fully inheriting PATH on Windows.
 
+## Fork Bug Fixes
+
+This fork (moyang-creator/opencode-obsidian) includes the following fixes on top of v0.2.1:
+
+### Fix 1: HTTP header encoding error with non-ASCII vault paths
+
+**Bug**: `request()` passes `this.projectDirectory` (full vault path) as raw `x-opencode-directory` header value. When vault path contains Chinese or other non-ASCII characters, browser `fetch()` throws `TypeError: String contains non ISO-8859-1 code point` and the request is never sent.
+
+**Fix**: `encodeURIComponent(this.projectDirectory)` at `main.js:1226`.
+
+### Fix 2: OPENCODE_SERVER_PASSWORD env var pollution
+
+**Bug**: `spawn()` passes `{ ...process.env }` to child process, inheriting system env var `OPENCODE_SERVER_PASSWORD`. If set, opencode serve starts with HTTP Basic Auth (401), causing plugin health check to fail.
+
+**Fix**: Override both `OPENCODE_SERVER_PASSWORD: ""` and `OPENCODE_SERVER_USERNAME: ""` in spawn env at `main.js:958` (custom command path) and `main.js:970` (built-in path).
+
+### Fix 3: opencode.exe singleton — must use .ps1 via PowerShell
+
+**Root Cause**: `opencode.exe` is a singleton process. Running multiple vaults with different ports requires `opencode.ps1`. With `shell: true`, cmd.exe cannot execute `.ps1` files.
+
+**Fix**: Set `useCustomCommand: true` with:
+```
+powershell.exe -NoProfile -NonInteractive -Command "& opencode.ps1 serve --port ... --hostname 127.0.0.1 --cors app://obsidian.md"
+```
+
+### Quick Install
+
+Copy the 4 files (`main.js`, `data.json`, `manifest.json`, `styles.css`) to your vault's `.obsidian/plugins/opencode-obsidian/` directory, then reload Obsidian.
+
