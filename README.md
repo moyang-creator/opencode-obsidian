@@ -113,9 +113,11 @@ This fork (moyang-creator/opencode-obsidian) includes the following fixes on top
 
 **Fix**: Override both `OPENCODE_SERVER_PASSWORD: ""` and `OPENCODE_SERVER_USERNAME: ""` in spawn env at `main.js:958` (custom command path) and `main.js:970` (built-in path).
 
-### Fix 3: opencode.exe singleton — must use .ps1 via PowerShell
+### Fix 3: Custom command must use opencode.ps1 via PowerShell
 
-**Root Cause**: `opencode.exe` is a singleton process. Running multiple vaults with different ports requires `opencode.ps1`. With `shell: true`, cmd.exe cannot execute `.ps1` files.
+**Root Cause**: With `shell: true`, `child_process.spawn` uses cmd.exe which cannot execute `.ps1` files. Also, the built-in port/hostname settings in the plugin settings panel may not properly pass `--cors app://obsidian.md` to the opencode server. Using `useCustomCommand: true` with the full command ensures all required flags are passed correctly.
+
+Note: `opencode serve` is NOT a singleton — multiple instances can run simultaneously on different ports, each as an independent OS process. The `.ps1` wrapper is needed for proper parameter passing and working directory isolation, not to circumvent a singleton limitation.
 
 **Fix**: Set `useCustomCommand: true` with:
 ```
