@@ -128,6 +128,12 @@ powershell.exe -NoProfile -NonInteractive -Command "& opencode.ps1 serve --port 
 
 **Fix**: After `loadSettings()`, extract the actual port from `customCommand` using regex `/--port\s+(\d+)/` and force-override `this.settings.port` at `main.js:1520-1525`.
 
+### Fix 5: Base64 path contains `/` breaks the iframe URL
+
+**Bug**: `getUrl()` base64-encodes the project directory and puts it in the iframe URL path. Standard base64 contains `/` characters, which split the URL into multiple path segments. The opencode SPA cannot extract the project directory from the broken URL and shows a blank screen.
+
+**Fix**: Wrap the base64 output with `encodeURIComponent()` at `main.js:938` to encode `/` as `%2F`, keeping the path as a single URL segment.
+
 ### Quick Install
 
 Copy the 4 files (`main.js`, `data.json`, `manifest.json`, `styles.css`) to your vault's `.obsidian/plugins/opencode-obsidian/` directory, then reload Obsidian.
