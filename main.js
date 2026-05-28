@@ -935,7 +935,7 @@ var ServerManager = class extends import_events.EventEmitter {
     return this.lastError;
   }
   getUrl() {
-    const encodedPath = Buffer.from(this.projectDirectory).toString("base64");
+    const encodedPath = encodeURIComponent(Buffer.from(this.projectDirectory).toString("base64"));
     return `http://${this.settings.hostname}:${this.settings.port}/${encodedPath}`;
   }
   async start() {
