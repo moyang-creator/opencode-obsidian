@@ -1517,6 +1517,13 @@ var OpenCodePlugin = class extends import_obsidian6.Plugin {
     console.log("Loading OpenCode plugin");
     registerOpenCodeIcons();
     await this.loadSettings();
+    // Force port from customCommand when useCustomCommand is true,
+    // prevents DEFAULT_SETTINGS.port=14096 from being used when
+    // loadData() returns null/undefined (e.g. race condition on startup)
+    if (this.settings.useCustomCommand && this.settings.customCommand) {
+      var portMatch = this.settings.customCommand.match(/--port\s+(\d+)/);
+      if (portMatch) this.settings.port = parseInt(portMatch[1], 10);
+    }
     await this.attemptAutodetect();
     const projectDirectory = this.getProjectDirectory();
     this.processManager = new ServerManager(this.settings, projectDirectory);
