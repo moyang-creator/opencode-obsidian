@@ -122,6 +122,12 @@ This fork (moyang-creator/opencode-obsidian) includes the following fixes on top
 powershell.exe -NoProfile -NonInteractive -Command "& opencode.ps1 serve --port ... --hostname 127.0.0.1 --cors app://obsidian.md"
 ```
 
+### Fix 4: Port reverts to default 14096 when loadData() returns null
+
+**Bug**: `loadSettings()` uses `Object.assign({}, DEFAULT_SETTINGS, await this.loadData())`. When Obsidian's `loadData()` returns `null/undefined` (race condition on startup), `Object.assign` ignores it and the `port` field falls back to `DEFAULT_SETTINGS.port = 14096`. The plugin then stubbornly uses port 14096 despite the correct config in data.json.
+
+**Fix**: After `loadSettings()`, extract the actual port from `customCommand` using regex `/--port\s+(\d+)/` and force-override `this.settings.port` at `main.js:1520-1525`.
+
 ### Quick Install
 
 Copy the 4 files (`main.js`, `data.json`, `manifest.json`, `styles.css`) to your vault's `.obsidian/plugins/opencode-obsidian/` directory, then reload Obsidian.
